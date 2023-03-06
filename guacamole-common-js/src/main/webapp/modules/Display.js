@@ -433,6 +433,7 @@ Guacamole.Display = function() {
          * @type {!number}
          */
         this.localTimestamp = new Date().getTime();
+        // console.log("Local Timestamp: "+this.localTimestamp);
 
         /**
          * The remote timestamp of sync instruction associated with this frame.
@@ -442,6 +443,11 @@ Guacamole.Display = function() {
          * @type {!number}
          */
         this.remoteTimestamp = timestamp || this.localTimestamp;
+        // console.log("!Remote Timestamp: "+this.remoteTimestamp);
+
+        // console.log("Lag: "+this.current - this.localTimestamp);
+        // console.log("Desktop FPS: "+(this.remoteDuration && this.remoteFrames) ? this.remoteFrames / this.remoteDuration : null);
+        // console.log("clientFps: "+this.statDuration ? this.localFrames / this.statDuration : null);
 
         /**
          * The number of remote desktop frames that were combined to produce
@@ -1801,6 +1807,8 @@ Guacamole.Display = function() {
     };
 
 };
+
+
 
 /**
  * Simple container for Guacamole.Layer, allowing layers to be easily

@@ -486,10 +486,15 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
 
             var message_xmlhttprequest = new XMLHttpRequest();
             message_xmlhttprequest.open("POST", TUNNEL_WRITE + tunnel.uuid);
+            console.log("sendPendingMessages : "+TUNNEL_WRITE+tunnel.uuid);
             message_xmlhttprequest.withCredentials = withCredentials;
+            console.log("Creds: "+credentials);
             addExtraHeaders(message_xmlhttprequest, extraHeaders);
+            console.log("MSG & Headers: "+message_xmlhttprequest+" // "+extraHeaders);
             message_xmlhttprequest.setRequestHeader("Content-type", "application/octet-stream");
             message_xmlhttprequest.setRequestHeader(TUNNEL_TOKEN_HEADER, tunnelSessionToken);
+            console.log("HEADER: "+TUNNEL_TOKEN_HEADER);
+            console.log("TunnelToken: "+tunnelSessionToken);
 
             // Once response received, send next queued event.
             message_xmlhttprequest.onreadystatechange = function() {
@@ -508,6 +513,7 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
                 }
             };
 
+            console.log("Output MessageBuffer: "+outputMessageBuffer);
             message_xmlhttprequest.send(outputMessageBuffer);
             outputMessageBuffer = ""; // Clear buffer
 
@@ -744,6 +750,7 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
     }
 
     this.connect = function(data) {
+        console.log("Connect: "+data.message);
 
         // Start waiting for connect
         resetTimers();
@@ -921,6 +928,7 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
 
     }
 
+    console.log("Tunnel URL: "+ tunnelURL);
     /**
      * Sends an internal "ping" instruction to the Guacamole WebSocket
      * endpoint, verifying network connection stability. If the network is
@@ -1056,6 +1064,7 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
         // Mark the tunnel as connecting
         tunnel.setState(Guacamole.Tunnel.State.CONNECTING);
 
+        console.log("Socket: "+tunnelURL+"?"+data+"guacamole");
         // Connect socket
         socket = new WebSocket(tunnelURL + "?" + data, "guacamole");
 
@@ -1274,6 +1283,7 @@ Guacamole.ChainedTunnel = function(tunnelChain) {
             // Assign UUID if already known
             if (tunnel.uuid)
                 chained_tunnel.setUUID(tunnel.uuid);
+                console.log("Tunnel UUID: "+tunnel.uuid);
 
             // Assign any future received UUIDs such that they are
             // accessible from the main uuid property of the chained tunnel
@@ -1282,7 +1292,7 @@ Guacamole.ChainedTunnel = function(tunnelChain) {
             };
 
             committedTunnel = tunnel;
-
+            console.log("Tunnel: "+tunnel.tunnelURL);
         }
 
         // Wrap own onstatechange within current tunnel

@@ -17,7 +17,10 @@
  * under the License.
  */
 
+
+
 var Guacamole = Guacamole || {};
+console.log("Guacamole loaded...");
 
 /**
  * Guacamole protocol client. Given a {@link Guacamole.Tunnel},
@@ -35,6 +38,8 @@ Guacamole.Client = function(tunnel) {
     var currentState = Guacamole.Client.State.IDLE;
     
     var currentTimestamp = 0;
+
+    var lastSendSync = 0;
 
     /**
      * The rough number of milliseconds to wait between sending keep-alive
@@ -1879,7 +1884,46 @@ Guacamole.Client = function(tunnel) {
         setState(Guacamole.Client.State.WAITING);
     };
 
+    var calculateLatency = function() {
+        try {
+            var startTime = Date.now();
+            console.log("Sending Sync...")
+            var pingData = "latencySync,"+startTime;
+            tunnel.sendMessage("sync",pingData);
+            console.log("Send Sync")
+
+            guac_client.onsync = function syncHandler(data) {
+            console.log("On sync called")
+            if (true) {
+                var receivedTime = Date.now();
+                var latency = receivedTime - startTime;
+
+                console.log("[1] Sync Received: "+receivedTime);
+                console.log("Latency:", latency+" ms");
+                // Create and dispatch custom event with latency information
+            //   var event = new CustomEvent("latency", {detail: {latency: latency}});
+            //   document.dispatchEvent(event);
+            }
+            var showLatency = document.getElementById('latency-value');
+            if (showLatency) {
+                console.log("Got Latency");
+                showLatency.innerHTML = latency;
+            }
+            // Remove syncHandler to avoid it being called multiple times
+            guac_client.onsync = null;
+            };
+        } catch (err) {
+            console.log("Error:", err.message);
+        }
+    };
+
+    setInterval(function() {
+        calculateLatency();
+    }, 500)
+    
+      
 };
+
 
 /**
  * All possible Guacamole Client states.
@@ -2078,3 +2122,54 @@ Guacamole.Client.Message = {
     "USER_LEFT": 0x0002
     
 };
+
+/**
+ * Calculates the latency between the client and the remote RDP server.
+ *
+ * Guacamole protocol client. Given a {@link Guacamole.Tunnel},
+ * automatically handles incoming and outgoing Guacamole instructions via the
+ * provided tunnel, updating its display using one or more canvas elements.
+ * 
+ * @constructor
+ * @private
+ * @param {!Guacamole.Tunnel} tunnel
+ * @returns {number} The latency in milliseconds.
+ */
+function calculateLatency(tunnel) {
+    console.log("calculating Latency")
+    var latency = 0;
+
+    console.log("Sending Test Message");
+    tunnel.sendMessage("testLatency", Date.timestamp);
+
+    /**
+     * The underlying Guacamole display.
+     *
+     * @private
+     * @type {!Guacamole.Display}
+     */ 
+    // var display = new Guacamole.Display();
+
+    // // Get the current time
+    // var currentTime = new Date().getTime();
+  
+    // // Calculate the time since the last frame was received
+    // var lastFrameTime = display.localTimestamp;
+    // var frameDelay = lastFrameTime ? currentTime - lastFrameTime : Number.MAX_SAFE_INTEGER;
+  
+    // // Calculate the time since the last ping was sent
+    // var lastSentPing = this.lastSentPing;
+    // var pingDelay = lastSentPing ? currentTime - lastSentPing : Number.MAX_SAFE_INTEGER;
+  
+    // // Use the smaller of the two delays
+    // var latency = Math.min(frameDelay, pingDelay);
+    
+    // console.log("Latency: "+ latency)
+
+
+    
+
+
+    return latency;
+  };
+  

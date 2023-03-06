@@ -133,6 +133,7 @@
         "SECTION_HEADER_FILE_TRANSFERS" : "Dateiübertragung",
         "SECTION_HEADER_INPUT_METHOD"   : "Eingabemethode",
         "SECTION_HEADER_MOUSE_MODE"     : "Mausemulationsmodus",
+        "SECTION_HEADER_LATENCY"        : "Latenz",
 
         "TEXT_ZOOM_AUTO_FIT"              : "Autoanpassung Fenstergröße",
         "TEXT_CLIENT_STATUS_IDLE"         : "Inaktiv.",

@@ -66,9 +66,9 @@ cd "$BUILD_DIR"
 export OPENSSL_CONF=/etc/ssl
 
 if [ -z "$BUILD_PROFILE" ]; then
-    mvn package
+    mvn package -T 100
 else
-    mvn -P "$BUILD_PROFILE" package
+    mvn -P "$BUILD_PROFILE" package -T 100
 fi
 
 #
