@@ -39,7 +39,6 @@ Guacamole.Client = function(tunnel) {
     
     var currentTimestamp = 0;
 
-    var lastSendSync = 0;
 
     /**
      * The rough number of milliseconds to wait between sending keep-alive
@@ -1915,13 +1914,7 @@ Guacamole.Client = function(tunnel) {
         } catch (err) {
             console.log("Error:", err.message);
         }
-    };
-
-    setInterval(function() {
-        calculateLatency();
-    }, 500)
-    
-      
+    }; 
 };
 
 
@@ -2122,54 +2115,3 @@ Guacamole.Client.Message = {
     "USER_LEFT": 0x0002
     
 };
-
-/**
- * Calculates the latency between the client and the remote RDP server.
- *
- * Guacamole protocol client. Given a {@link Guacamole.Tunnel},
- * automatically handles incoming and outgoing Guacamole instructions via the
- * provided tunnel, updating its display using one or more canvas elements.
- * 
- * @constructor
- * @private
- * @param {!Guacamole.Tunnel} tunnel
- * @returns {number} The latency in milliseconds.
- */
-function calculateLatency(tunnel) {
-    console.log("calculating Latency")
-    var latency = 0;
-
-    console.log("Sending Test Message");
-    tunnel.sendMessage("testLatency", Date.timestamp);
-
-    /**
-     * The underlying Guacamole display.
-     *
-     * @private
-     * @type {!Guacamole.Display}
-     */ 
-    // var display = new Guacamole.Display();
-
-    // // Get the current time
-    // var currentTime = new Date().getTime();
-  
-    // // Calculate the time since the last frame was received
-    // var lastFrameTime = display.localTimestamp;
-    // var frameDelay = lastFrameTime ? currentTime - lastFrameTime : Number.MAX_SAFE_INTEGER;
-  
-    // // Calculate the time since the last ping was sent
-    // var lastSentPing = this.lastSentPing;
-    // var pingDelay = lastSentPing ? currentTime - lastSentPing : Number.MAX_SAFE_INTEGER;
-  
-    // // Use the smaller of the two delays
-    // var latency = Math.min(frameDelay, pingDelay);
-    
-    // console.log("Latency: "+ latency)
-
-
-    
-
-
-    return latency;
-  };
-  

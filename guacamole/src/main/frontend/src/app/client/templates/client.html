@@ -195,10 +195,80 @@
                 <div class="menu-section" id="latency-status">
                     <h3>{{'CLIENT.SECTION_HEADER_LATENCY' | translate}}</h3>
                     <div class="content">
-                        <div id="show-latency">
-                            <p>Latency: <span id="latency-value">N/A</span> ms</p>
+                        <div id="current-latency">
+                            <p>{{'CLIENT.TEXT_LATENCY_CURRENT' | translate}}: <span id="latency-value">N/A</span> ms</p>
+                            <p>{{'CLIENT.TEXT_LATENCY_AVERAGE' | translate}}: <span id="average-latency-value">N/A</span> ms</p>
                         </div>
                     </div>
+                    
+                    <div>
+                        <canvas id="latencyHistory" style="height:100%;max-height:200px;width:100%;max-width:400px"></canvas>
+                    </div>
+                                        
+                    <script>
+                    
+
+                    var latencyHistoryChart = new Chart("latencyHistory", {
+                        type: 'line',
+                        data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Latency',
+                            data: [],
+                            fill: false,
+                            borderColor: 'rgb(21,117,141)',
+                            tension: 0.1
+                        }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                beginAtZero: true,
+                                ticks: {
+                                        callback: function(value, index, ticks) {
+                                            return value + ' ms';
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+
+                    function setAverageLatency() {
+                        var values = latencyHistoryChart.data.datasets[0].data;
+                        var average = values.reduce((a, b) => a + b, 0) / values.length;
+                        var averageLatency = document.getElementById('average-latency-value');
+                        if (averageLatency) {
+                            averageLatency.innerHTML = average.toFixed(2);
+                        }
+                    }
+
+                    function shiftChart() {
+                        latencyHistoryChart.data.labels.shift();
+                        latencyHistoryChart.data.datasets.forEach((dataset) => {
+                            dataset.data.shift();
+                        });
+                    }
+
+                    function addLatencyValue(data) {
+                        var chartLength = latencyHistoryChart.data.labels.length;
+                        if(chartLength>20){
+                            shiftChart();
+                        }
+                        latencyHistoryChart.data.labels.push("");
+                        latencyHistoryChart.data.datasets.forEach((dataset) => {
+                            dataset.data.push(data);
+                        });
+                        setAverageLatency();
+                        latencyHistoryChart.update();
+                    }
+
+                    </script>
                 </div>
 
             </div>

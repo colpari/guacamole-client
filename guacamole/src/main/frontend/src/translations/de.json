@@ -143,6 +143,8 @@
         "TEXT_CLIENT_STATUS_WAITING"      : "Verbindungsaufbau zu Guacamole. Bitte warten...",
         "TEXT_RECONNECT_COUNTDOWN"        : "Neuverbindung in {REMAINING} {REMAINING, plural, one{Sekunde} other{Sekunden}}...",
         "TEXT_FILE_TRANSFER_PROGRESS"     : "{PROGRESS} {UNIT, select, b{B} kb{KB} mb{MB} gb{GB} other{}}",
+        "TEXT_LATENCY_CURRENT"            : "Aktuell",
+        "TEXT_LATENCY_AVERAGE"            : "Durchschnitt",
 
         "URL_OSK_LAYOUT" : "layouts/de-de-qwertz.json"
 

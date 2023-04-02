@@ -1099,6 +1099,17 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
 
             var elements = [];
 
+            if(message.includes("ping")) {
+
+                var latency = Date.now() - lastSentPing;
+                console.log("[PING] Latency: "+latency+" ms");
+                var showLatency = document.getElementById('latency-value');
+                if (showLatency) {
+                    showLatency.innerHTML = latency;
+                    addLatencyValue(latency);
+                }
+            };
+
             do {
 
                 // Search for end of length
