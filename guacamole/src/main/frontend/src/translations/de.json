@@ -145,6 +145,8 @@
         "TEXT_FILE_TRANSFER_PROGRESS"     : "{PROGRESS} {UNIT, select, b{B} kb{KB} mb{MB} gb{GB} other{}}",
         "TEXT_LATENCY_CURRENT"            : "Aktuell",
         "TEXT_LATENCY_AVERAGE"            : "Durchschnitt",
+        "TEXT_LATENCY_SAMPLES"            : "Latenzwerte",
+        "TEXT_LATENCY_RESET"              : "Zurücksetzen",
 
         "URL_OSK_LAYOUT" : "layouts/de-de-qwertz.json"
 

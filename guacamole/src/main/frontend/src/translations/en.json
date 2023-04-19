@@ -165,6 +165,8 @@
         "TEXT_FILE_TRANSFER_PROGRESS"     : "{PROGRESS} {UNIT, select, b{B} kb{KB} mb{MB} gb{GB} other{}}",
         "TEXT_LATENCY_CURRENT"            : "Current",
         "TEXT_LATENCY_AVERAGE"            : "Average",
+        "TEXT_LATENCY_SAMPLES"            : "Latency samples",
+        "TEXT_LATENCY_RESET"              : "Reset",
 
         "URL_OSK_LAYOUT" : "layouts/en-us-qwerty.json"
 
