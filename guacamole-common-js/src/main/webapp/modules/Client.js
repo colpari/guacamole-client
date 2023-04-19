@@ -17,10 +17,7 @@
  * under the License.
  */
 
-
-
 var Guacamole = Guacamole || {};
-console.log("Guacamole loaded...");
 
 /**
  * Guacamole protocol client. Given a {@link Guacamole.Tunnel},
@@ -38,7 +35,6 @@ Guacamole.Client = function(tunnel) {
     var currentState = Guacamole.Client.State.IDLE;
     
     var currentTimestamp = 0;
-
 
     /**
      * The rough number of milliseconds to wait between sending keep-alive
@@ -1883,40 +1879,7 @@ Guacamole.Client = function(tunnel) {
         setState(Guacamole.Client.State.WAITING);
     };
 
-    var calculateLatency = function() {
-        try {
-            var startTime = Date.now();
-            console.log("Sending Sync...")
-            var pingData = "latencySync,"+startTime;
-            tunnel.sendMessage("sync",pingData);
-            console.log("Send Sync")
-
-            guac_client.onsync = function syncHandler(data) {
-            console.log("On sync called")
-            if (true) {
-                var receivedTime = Date.now();
-                var latency = receivedTime - startTime;
-
-                console.log("[1] Sync Received: "+receivedTime);
-                console.log("Latency:", latency+" ms");
-                // Create and dispatch custom event with latency information
-            //   var event = new CustomEvent("latency", {detail: {latency: latency}});
-            //   document.dispatchEvent(event);
-            }
-            var showLatency = document.getElementById('latency-value');
-            if (showLatency) {
-                console.log("Got Latency");
-                showLatency.innerHTML = latency;
-            }
-            // Remove syncHandler to avoid it being called multiple times
-            guac_client.onsync = null;
-            };
-        } catch (err) {
-            console.log("Error:", err.message);
-        }
-    }; 
 };
-
 
 /**
  * All possible Guacamole Client states.

@@ -1288,6 +1288,7 @@ Guacamole.ChainedTunnel = function(tunnelChain) {
             };
 
             committedTunnel = tunnel;
+
         }
 
         // Wrap own onstatechange within current tunnel
