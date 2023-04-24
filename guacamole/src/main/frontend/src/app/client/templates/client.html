@@ -218,30 +218,25 @@
                     
                     <script>
                     
-                        if(!localStorage.getItem("ltc-samples")) {
-                            localStorage.setItem("ltc-samples", 40);
-                        } else if(!localStorage.getItem('ltc-values')) {
-                            localStorage.setItem("ltc-values", []);
-                        } else if(!localStorage.getItem('ltc-min')) {
-                            localStorage.setItem("ltc-min", []);
-                        } else if(!localStorage.getItem('ltc-max')) {
-                            localStorage.setItem("ltc-max", []);
+                        Guacamole.Latency = {
+                            "ltc-values": [],
+                            "ltc-timestamps": [],
+                            "ltc-samples": 60,
+                            "ltc-min": null,
+                            "ltc-max": null
                         }
                         
-                        if(localStorage.getItem('ltc-min')!=""){
-                            setInnerHTML('ltc-min', localStorage.getItem('ltc-min'));
+                        if(Guacamole.Latency['ltc-min']!=null){
+                            setInnerHTML('ltc-min', Guacamole.Latency['ltc-min']);
                         }
-                        if(localStorage.getItem('ltc-max')!=""){
-                            setInnerHTML('ltc-max', localStorage.getItem('ltc-max'));
+                        if(Guacamole.Latency['ltc-max']!=null){
+                            setInnerHTML('ltc-max', Guacamole.Latency['ltc-max']);
                         }
                         
-                        var all_values = localStorage.getItem('ltc-values').split(',');
-                        var all_ltc_values = [];
-                        var all_ltc_timestamps = [];
+                        var all_ltc_values = Guacamole.Latency['ltc-values'];
+                        var all_ltc_timestamps = Guacamole.Latency['ltc-timestamps'];
 
-                        all_values.reduce((a,b) => {if(b==""){all_values.shift();return};all_ltc_values.push(b.split('|').map(Number)[0]);all_ltc_timestamps.push(b.split('|').map(Number)[1])}, 0);
-
-                        var ltc_values = all_ltc_values.slice(all_ltc_values.length-localStorage.getItem("ltc-samples"),all_ltc_values.length);
+                        var ltc_values = all_ltc_values.slice(all_ltc_values.length-Guacamole.Latency["ltc-samples"],all_ltc_values.length);
 
                         var latencyHistoryChart = new Chart("ltcHistory", {
                             type: 'line',
@@ -291,22 +286,22 @@
                         }
 
                         function addLatencyValue(data) {
+
+                            let currentDate = Date.now();
                             
-                            if ((Date.now()-all_ltc_timestamps[0])>601000) {
-                                all_values.shift();
+                            if ((currentDate-all_ltc_timestamps[0])>601000) {
                                 all_ltc_values.shift();
                                 all_ltc_timestamps.shift();
                             }
                             
                             var chartLength = ltc_values.length;
-                            if(chartLength+1>localStorage.getItem("ltc-samples")){
+                            if(chartLength+1>Guacamole.Latency["ltc-samples"]){
                                 ltc_values.shift();
                             }
                             
                             all_ltc_values.push(data);
                             ltc_values.push(data);
-                            all_ltc_timestamps.push(Date.now());
-                            all_values.push(data+"|"+Date.now());
+                            all_ltc_timestamps.push(currentDate);
 
                             setInnerHTML('ltc-current-value', data.toFixed(2));
 
@@ -316,17 +311,18 @@
                             latencyHistoryChart.data.datasets[0].data = ltc_values;
                             latencyHistoryChart.data.labels = Array(ltc_values.length).fill("");
                             
-                            localStorage.setItem("ltc-values", all_values);
+                            Guacamole.Latency["ltc-values"] = all_ltc_values;
+                            Guacamole.Latency["ltc-timestamps"] = all_ltc_timestamps;
                             
                             // Check averages
-                            if(all_ltc_timestamps[0]<(Date.now()-600000)) {
-                                let longArray = all_ltc_values.slice(all_ltc_timestamps.indexOf(findNearestValue(all_ltc_timestamps,(Date.now()-600000))), all_ltc_values.length)
+                            if(all_ltc_timestamps[0]<(currentDate-600000)) {
+                                let longArray = all_ltc_values.slice(all_ltc_timestamps.indexOf(findNearestValue(all_ltc_timestamps,(currentDate-600000))), all_ltc_values.length)
                                 setInnerHTML('ltc-10-average', getAverage(longArray).toFixed(2));
-                                let shortArray = all_ltc_values.slice(all_ltc_timestamps.indexOf(findNearestValue(all_ltc_timestamps,(Date.now()-60000))), all_ltc_values.length)
+                                let shortArray = all_ltc_values.slice(all_ltc_timestamps.indexOf(findNearestValue(all_ltc_timestamps,(currentDate-60000))), all_ltc_values.length)
                                 setInnerHTML('ltc-1-average', getAverage(shortArray).toFixed(2));
 
-                            } else if(all_ltc_timestamps[0]<(Date.now()-60000)) {
-                                let shortArray = all_ltc_values.slice(all_ltc_timestamps.indexOf(findNearestValue(all_ltc_timestamps,(Date.now()-60000))), all_ltc_values.length)
+                            } else if(all_ltc_timestamps[0]<(currentDate-60000)) {
+                                let shortArray = all_ltc_values.slice(all_ltc_timestamps.indexOf(findNearestValue(all_ltc_timestamps,(currentDate-60000))), all_ltc_values.length)
                                 setInnerHTML('ltc-1-average', getAverage(shortArray).toFixed(2));
                             }
 
@@ -334,20 +330,20 @@
                         }
 
                         function checkLatencyMinMax(latency) {
-                            var min = localStorage.getItem("ltc-min");
-                            var max = localStorage.getItem("ltc-max");
+                            var min = Guacamole.Latency["ltc-min"];
+                            var max = Guacamole.Latency["ltc-max"];
                             
                             if(latency<min) {
-                                localStorage.setItem("ltc-min", latency);
+                                Guacamole.Latency["ltc-min"] = latency;
                                 setInnerHTML('ltc-min', latency.toFixed(2));
                             } else if(latency>max) {
-                                localStorage.setItem("ltc-max", latency);
+                                Guacamole.Latency["ltc-max"] = latency;
                                 setInnerHTML('ltc-max', latency.toFixed(2));
-                            } else if(min=="") {
-                                localStorage.setItem("ltc-min", latency);
+                            } else if(min==null) {
+                                Guacamole.Latency["ltc-min"] = latency;
                                 setInnerHTML('ltc-min', latency.toFixed(2));
-                            } else if(max==""){
-                                localStorage.setItem("ltc-max", latency);
+                            } else if(max==null){
+                                Guacamole.Latency["ltc-max"] = latency;
                                 setInnerHTML('ltc-max', latency.toFixed(2));
                             }
                         }
@@ -356,7 +352,7 @@
 
                         var latency_samples = document.getElementById('ltc-samples');
                         
-                        latency_samples.value = localStorage.getItem('ltc-samples');
+                        latency_samples.value = Guacamole.Latency['ltc-samples'];
                         
 
                         var latency_samples_form = document.getElementById('ltc-samples-form');
@@ -366,7 +362,7 @@
                             } else {
                                 ltc_values = all_ltc_values.slice(all_ltc_values.length-latency_samples.value,all_ltc_values.length);
                             }
-                            localStorage.setItem("ltc-samples", latency_samples.value);
+                            Guacamole.Latency["ltc-samples"] = latency_samples.value;
                         };
 
                         function resetLatency() {
@@ -374,15 +370,15 @@
 
                             if(!reponseConfirm){return}
 
-                            localStorage.setItem("ltc-values", []);
-                            localStorage.setItem("ltc-min", []);
-                            localStorage.setItem("ltc-max", []);
+                            Guacamole.Latency["ltc-values"] = [];
+                            Guacamole.Latency["ltc-timestamps"] = [];
+                            Guacamole.Latency["ltc-min"] = [];
+                            Guacamole.Latency["ltc-max"] = [];
                             setInnerHTML("ltc-min", "N/A");
                             setInnerHTML("ltc-max", "N/A");
                             setInnerHTML("ltc-1-average", "N/A");
                             setInnerHTML("ltc-10-average", "N/A");
                             setInnerHTML("ltc-current-value", "N/A");
-                            all_values = [];
                             ltc_values = [];
                             all_ltc_timestamps = [];
                             all_ltc_values = [];

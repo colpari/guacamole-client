@@ -16,7 +16,8 @@
         "file-saver": "^2.0.5",
         "jquery": "^3.6.3",
         "jstz": "^2.1.1",
-        "lodash": "^4.17.21"
+        "lodash": "^4.17.21",
+        "chart.js": "4.2.1"
     },
     "devDependencies": {
         "clean-webpack-plugin": "^4.0.0",
