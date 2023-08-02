@@ -218,12 +218,14 @@
                     
                     <script>
                     
-                        Guacamole.Latency = {
-                            "ltc-values": [],
-                            "ltc-timestamps": [],
-                            "ltc-samples": 60,
-                            "ltc-min": null,
-                            "ltc-max": null
+                        if ( Guacamole.Latency == undefined) {
+                            Guacamole.Latency = {
+                                "ltc-values": [],
+                                "ltc-timestamps": [],
+                                "ltc-samples": 60,
+                                "ltc-min": null,
+                                "ltc-max": null
+                            }
                         }
                         
                         if(Guacamole.Latency['ltc-min']!=null){
