@@ -232,5 +232,30 @@ public class SQLServerGuacamoleProperties {
         public String getName() { return "sqlserver-enforce-access-windows-for-active-sessions"; }
 
     };
+    
+    /**
+     * The maximum number of identifiers/parameters to be included in a single batch when
+     * executing SQL statements.
+     */
+    public static final IntegerGuacamoleProperty SQLSERVER_BATCH_SIZE =
+            new IntegerGuacamoleProperty() {
+
+        @Override
+        public String getName() { return "sqlserver-batch-size"; }
+
+    };
+
+    /**
+     * Whether or not all server certificates should be trusted, including those
+     * signed by an unknown certificate authority, such as self-signed
+     * certificates.
+     */
+    public static final BooleanGuacamoleProperty SQLSERVER_TRUST_ALL_SERVER_CERTIFICATES =
+            new BooleanGuacamoleProperty() {
+
+        @Override
+        public String getName() { return "sqlserver-trust-all-server-certificates"; }
+
+    };
 
 }
