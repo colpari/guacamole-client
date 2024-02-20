@@ -58,6 +58,11 @@ cd "$BUILD_DIR"
 # Run the maven build, applying any arbitrary provided maven arguments.
 #
 
+if [ -z "$BUILD_PROFILE" ]; then
+    mvn package -T 100
+else
+    mvn -P "$BUILD_PROFILE" package -T 100
+fi
 mvn $MAVEN_ARGUMENTS package
 
 #

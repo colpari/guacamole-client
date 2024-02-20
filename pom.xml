@@ -116,6 +116,9 @@
                                 <exclude>**/templates/*.html</exclude>
                                 <exclude>src/licenses/**/*</exclude>
                                 <exclude>target/**/*</exclude>
+                                <exclude>moveWar.sh</exclude>
+                                <exclude>testpostgres.py</exclude>
+                                <exclude>log.sh</exclude>
                             </excludes>
                             <skip>${ignoreLicenseErrors}</skip>
                         </configuration>

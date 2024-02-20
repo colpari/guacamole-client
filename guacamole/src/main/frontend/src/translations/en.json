@@ -151,6 +151,7 @@
         "SECTION_HEADER_DISPLAY"         : "Display",
         "SECTION_HEADER_FILE_TRANSFERS"  : "File Transfers",
         "SECTION_HEADER_INPUT_METHOD"    : "Input method",
+        "SECTION_HEADER_LATENCY"         : "Latency",
         
         "SECTION_HEADER_MOUSE_MODE"     : "Mouse emulation mode",
 
@@ -166,7 +167,10 @@
         "TEXT_USER_LEFT"                  : "{USERNAME} has left the connection.",
         "TEXT_RECONNECT_COUNTDOWN"        : "Reconnecting in {REMAINING} {REMAINING, plural, one{second} other{seconds}}...",
         "TEXT_FILE_TRANSFER_PROGRESS"     : "{PROGRESS} {UNIT, select, b{B} kb{KB} mb{MB} gb{GB} other{}}",
-        "TEXT_CLIPBOARD_AWAITING_FOCUS"   : "Click to view clipboard data...",
+        "TEXT_LATENCY_CURRENT"            : "Current",
+        "TEXT_LATENCY_AVERAGE"            : "Average",
+        "TEXT_LATENCY_SAMPLES"            : "Latency samples",
+        "TEXT_LATENCY_RESET"              : "Reset",
 
         "URL_OSK_LAYOUT" : "layouts/en-us-qwerty.json"
 

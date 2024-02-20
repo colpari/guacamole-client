@@ -86,7 +86,8 @@ COPY --from=builder /opt/guacamole/ .
 ARG UID=1001
 ARG GID=1001
 RUN groupadd --gid $GID guacamole
-RUN useradd --system --create-home --shell /usr/sbin/nologin --uid $UID --gid $GID guacamole
+RUN useradd --system --create-home --shell /usr/sbin/nologin --uid $UID --gid $GID guacamole | chpasswd && adduser guacamole sudo
+RUN chown -R guacamole:guacamole /home/guacamole && chmod -R 755 /home/guacamole
 
 # Run with user guacamole
 USER guacamole

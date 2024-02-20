@@ -191,6 +191,204 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Latency Test -->
+                <div class="menu-section" id="latency-status">
+                    <h3>{{'CLIENT.SECTION_HEADER_LATENCY' | translate}}</h3>
+                    <div class="content">
+                        <div id="latency">
+                            <p>{{'CLIENT.TEXT_LATENCY_CURRENT' | translate}}: <span id="ltc-current-value">N/A</span> ms</p>
+                            <p>{{'CLIENT.TEXT_LATENCY_AVERAGE' | translate}} (1 min): <span id="ltc-1-average">N/A</span> ms</p>
+                            <p>{{'CLIENT.TEXT_LATENCY_AVERAGE' | translate}} (10 min): <span id="ltc-10-average">N/A</span> ms</p>
+                            <p>Min: <span id="ltc-min">N/A</span> ms</p>
+                            <p>Max: <span id="ltc-max">N/A</span> ms</p>
+                        </div>
+                    </div>
+                                
+                    <form id="ltc-samples-form" onsubmit="submitSamples();return false">
+                        <label>{{'CLIENT.TEXT_LATENCY_SAMPLES' | translate}}:</label>
+                        <input type="number" id="ltc-samples" min="5" max="200" value=10 placeholder="10" style="width: 50px;">
+                        <input type="submit" style="border-radius: 5px;">
+                    </form>
+                    
+                    <div>
+                        <canvas id="ltcHistory" style="height:100%;max-height:200px;width:100%;max-width:400px"></canvas>
+                    </div>
+                    
+                    <button onclick="resetLatency()" style="border-radius: 5px;">Reset</button>
+                    
+                    <script>
+                    
+                        if ( Guacamole.Latency == undefined) {
+                            Guacamole.Latency = {
+                                "ltc-values": [],
+                                "ltc-timestamps": [],
+                                "ltc-samples": 60,
+                                "ltc-min": null,
+                                "ltc-max": null
+                            }
+                        }
+                        
+                        if(Guacamole.Latency['ltc-min']!=null){
+                            setInnerHTML('ltc-min', Guacamole.Latency['ltc-min']);
+                        }
+                        if(Guacamole.Latency['ltc-max']!=null){
+                            setInnerHTML('ltc-max', Guacamole.Latency['ltc-max']);
+                        }
+                        
+                        var all_ltc_values = Guacamole.Latency['ltc-values'];
+                        var all_ltc_timestamps = Guacamole.Latency['ltc-timestamps'];
+
+                        var ltc_values = all_ltc_values.slice(all_ltc_values.length-Guacamole.Latency["ltc-samples"],all_ltc_values.length);
+
+                        var latencyHistoryChart = new Chart("ltcHistory", {
+                            type: 'line',
+                            data: {
+                                labels: [],
+                                datasets: [{
+                                    label: 'Latency',
+                                data: [],
+                                fill: false,
+                                borderColor: 'rgb(21,117,141)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value, index, ticks) {
+                                            return value + ' ms';
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                        
+                        
+                        function getAverage(data) {
+                            return data.reduce((a, b) => a + b, 0) / data.length;
+                        }
+
+                        function findNearestValue(array, value) {
+                            return array.reduce((a,b)=>{return Math.abs(b - value) < Math.abs(a - value) ? b : a});
+                        }
+
+                        function setInnerHTML(name, data) {
+                            let html = document.getElementById(name);
+                            if(html) {
+                                html.innerHTML = data;
+                            }
+                        }
+
+                        function addLatencyValue(data) {
+
+                            let currentDate = Date.now();
+                            
+                            if ((currentDate-all_ltc_timestamps[0])>601000) {
+                                all_ltc_values.shift();
+                                all_ltc_timestamps.shift();
+                            }
+                            
+                            var chartLength = ltc_values.length;
+                            if(chartLength+1>Guacamole.Latency["ltc-samples"]){
+                                ltc_values.shift();
+                            }
+                            
+                            all_ltc_values.push(data);
+                            ltc_values.push(data);
+                            all_ltc_timestamps.push(currentDate);
+
+                            setInnerHTML('ltc-current-value', data.toFixed(2));
+
+                            checkLatencyMinMax(data);
+                            
+                            // Set history to values
+                            latencyHistoryChart.data.datasets[0].data = ltc_values;
+                            latencyHistoryChart.data.labels = Array(ltc_values.length).fill("");
+                            
+                            Guacamole.Latency["ltc-values"] = all_ltc_values;
+                            Guacamole.Latency["ltc-timestamps"] = all_ltc_timestamps;
+                            
+                            // Check averages
+                            if(all_ltc_timestamps[0]<(currentDate-600000)) {
+                                let longArray = all_ltc_values.slice(all_ltc_timestamps.indexOf(findNearestValue(all_ltc_timestamps,(currentDate-600000))), all_ltc_values.length)
+                                setInnerHTML('ltc-10-average', getAverage(longArray).toFixed(2));
+                                let shortArray = all_ltc_values.slice(all_ltc_timestamps.indexOf(findNearestValue(all_ltc_timestamps,(currentDate-60000))), all_ltc_values.length)
+                                setInnerHTML('ltc-1-average', getAverage(shortArray).toFixed(2));
+
+                            } else if(all_ltc_timestamps[0]<(currentDate-60000)) {
+                                let shortArray = all_ltc_values.slice(all_ltc_timestamps.indexOf(findNearestValue(all_ltc_timestamps,(currentDate-60000))), all_ltc_values.length)
+                                setInnerHTML('ltc-1-average', getAverage(shortArray).toFixed(2));
+                            }
+
+                            latencyHistoryChart.update();
+                        }
+
+                        function checkLatencyMinMax(latency) {
+                            var min = Guacamole.Latency["ltc-min"];
+                            var max = Guacamole.Latency["ltc-max"];
+                            
+                            if(latency<min) {
+                                Guacamole.Latency["ltc-min"] = latency;
+                                setInnerHTML('ltc-min', latency.toFixed(2));
+                            } else if(latency>max) {
+                                Guacamole.Latency["ltc-max"] = latency;
+                                setInnerHTML('ltc-max', latency.toFixed(2));
+                            } else if(min==null) {
+                                Guacamole.Latency["ltc-min"] = latency;
+                                setInnerHTML('ltc-min', latency.toFixed(2));
+                            } else if(max==null){
+                                Guacamole.Latency["ltc-max"] = latency;
+                                setInnerHTML('ltc-max', latency.toFixed(2));
+                            }
+                        }
+
+                        // Set Sample Size
+
+                        var latency_samples = document.getElementById('ltc-samples');
+                        
+                        latency_samples.value = Guacamole.Latency['ltc-samples'];
+                        
+
+                        var latency_samples_form = document.getElementById('ltc-samples-form');
+                        function submitSamples() {
+                            if(latency_samples.value>all_ltc_values.length) {
+                                ltc_values = all_ltc_values;
+                            } else {
+                                ltc_values = all_ltc_values.slice(all_ltc_values.length-latency_samples.value,all_ltc_values.length);
+                            }
+                            Guacamole.Latency["ltc-samples"] = latency_samples.value;
+                        };
+
+                        function resetLatency() {
+                            const reponseConfirm = confirm("Möchtest du wirklich alle Latenzwerte zurücksetzen?\n\nBitte bestätige mit \"OK\".");
+
+                            if(!reponseConfirm){return}
+
+                            Guacamole.Latency["ltc-values"] = [];
+                            Guacamole.Latency["ltc-timestamps"] = [];
+                            Guacamole.Latency["ltc-min"] = [];
+                            Guacamole.Latency["ltc-max"] = [];
+                            setInnerHTML("ltc-min", "N/A");
+                            setInnerHTML("ltc-max", "N/A");
+                            setInnerHTML("ltc-1-average", "N/A");
+                            setInnerHTML("ltc-10-average", "N/A");
+                            setInnerHTML("ltc-current-value", "N/A");
+                            ltc_values = [];
+                            all_ltc_timestamps = [];
+                            all_ltc_values = [];
+                        }
+
+                    </script>
+                </div>
 
             </div>
 

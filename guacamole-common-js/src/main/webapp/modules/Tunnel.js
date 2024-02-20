@@ -1015,12 +1015,78 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
 
             resetTimers();
 
-            try {
-                parser.receive(event.data);
-            }
-            catch (e) {
-                close_tunnel(new Guacamole.Status(Guacamole.Status.Code.SERVER_ERROR, e.message));
-            }
+            var message = event.data;
+            var startIndex = 0;
+            var elementEnd;
+
+            var elements = [];
+
+            if(message.includes("ping")) {
+
+                var latency = Date.now() - lastSentPing;
+                addLatencyValue(latency);
+            };
+
+            do {
+
+                // Search for end of length
+                var lengthEnd = message.indexOf(".", startIndex);
+                if (lengthEnd !== -1) {
+
+                    // Parse length
+                    var length = parseInt(message.substring(elementEnd+1, lengthEnd));
+
+                    // Calculate start of element
+                    startIndex = lengthEnd + 1;
+
+                    // Calculate location of element terminator
+                    elementEnd = startIndex + length;
+
+                }
+                
+                // If no period, incomplete instruction.
+                else
+                    close_tunnel(new Guacamole.Status(Guacamole.Status.Code.SERVER_ERROR, "Incomplete instruction."));
+
+                // We now have enough data for the element. Parse.
+                var element = message.substring(startIndex, elementEnd);
+                var terminator = message.substring(elementEnd, elementEnd+1);
+
+                // Add element to array
+                elements.push(element);
+
+                // If last element, handle instruction
+                if (terminator === ";") {
+
+                    // Get opcode
+                    var opcode = elements.shift();
+
+                    // Update state and UUID when first instruction received
+                    if (tunnel.uuid === null) {
+
+                        // Associate tunnel UUID if received
+                        if (opcode === Guacamole.Tunnel.INTERNAL_DATA_OPCODE && elements.length === 1)
+                            tunnel.setUUID(elements[0]);
+
+                        // Tunnel is now open and UUID is available
+                        tunnel.setState(Guacamole.Tunnel.State.OPEN);
+
+                    }
+
+                    // Call instruction handler.
+                    if (opcode !== Guacamole.Tunnel.INTERNAL_DATA_OPCODE && tunnel.oninstruction)
+                        tunnel.oninstruction(opcode, elements);
+
+                    // Clear elements
+                    elements.length = 0;
+
+                }
+
+                // Start searching for length at character after
+                // element terminator
+                startIndex = elementEnd + 1;
+
+            } while (startIndex < message.length);
 
         };
 

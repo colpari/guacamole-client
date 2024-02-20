@@ -150,6 +150,7 @@
         "SECTION_HEADER_INPUT_METHOD"    : "Eingabemethode",
 
         "SECTION_HEADER_MOUSE_MODE"     : "Mausemulationsmodus",
+        "SECTION_HEADER_LATENCY"        : "Latenz",
 
         "TEXT_ANONYMOUS_USER_JOINED"      : "Ein unbekannter Benutzer ist der Verbindung beigetreten.",
         "TEXT_ANONYMOUS_USER_LEFT"        : "Ein unbekannter Benutzer hat die Verbindung verlassen.",
@@ -163,8 +164,11 @@
         "TEXT_USER_LEFT"                  : "{USERNAME} hat die Verbindung verlassen.",
         "TEXT_RECONNECT_COUNTDOWN"        : "Neuverbindung in {REMAINING} {REMAINING, plural, one{Sekunde} other{Sekunden}}...",
         "TEXT_FILE_TRANSFER_PROGRESS"     : "{PROGRESS} {UNIT, select, b{B} kb{KB} mb{MB} gb{GB} other{}}",
+        "TEXT_LATENCY_CURRENT"            : "Aktuell",
+        "TEXT_LATENCY_AVERAGE"            : "Durchschnitt",
+        "TEXT_LATENCY_SAMPLES"            : "Latenzwerte",
+        "TEXT_LATENCY_RESET"              : "Zurücksetzen",
         "TEXT_CLIPBOARD_AWAITING_FOCUS"   : "Klicken um Zwischenablage anzuzeigen...",
-
         "URL_OSK_LAYOUT" : "layouts/de-de-qwertz.json"
 
     },
